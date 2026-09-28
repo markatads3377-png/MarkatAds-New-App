@@ -1,11 +1,286 @@
-<div align="center">
+# Media Marketplace Hub
 
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+❤️ FULL LOVABLE WEBAPP PROMPT (Single Prompt — Copy & Paste)
 
-  <h1>Built with AI Studio</h2>
+Build a complete WebApp called “Media Mix Marketplace (MMM)” with a unified signup and login system for both Buyer and Seller portals. The platform must allow users to create an account using Username, Email/Phone, Password, and Repeat Password. After signup, users must select their role (Buyer or Seller). The system must redirect users to the correct dashboard based on their role. The WebApp must include all advertising medium listing and buying features. Use a modern, premium matte‑red theme with a clean UI. Make the platform extremely easy to use and mobile‑first.
 
-  <p>The fastest path from prompt to production with Gemini.</p>
+🔐 ACCOUNT CREATION (Signup Page Requirements)
 
-  <a href="https://aistudio.google.com/apps">Start building</a>
+Create one single signup page with the following fields:
 
-</div>
+Username (unique)
+
+Email or Phone Number
+
+Password
+
+Repeat Password (must match password)
+
+Role Selection → Buyer / Seller
+
+Terms & Conditions checkbox
+
+OTP verification for email/phone
+
+Signup validation rules:
+
+Username must be unique
+
+Password must be minimum 8 characters
+
+Repeat password must match
+
+OTP must be verified before account creation
+
+After signup:
+
+If role = Buyer → redirect to Buyer Dashboard
+
+If role = Seller → redirect to Seller Dashboard
+
+🔑 LOGIN PAGE (Unified Login)
+
+Create one login page for both roles:
+
+Username
+
+Password
+
+“Forgot Password” option
+
+OTP reset system
+
+System automatically detects the user’s role and redirects them to the correct portal.
+
+🔵 BUYER PORTAL (Advertiser Portal)
+
+Buyer Dashboard must include:
+
+Browse all advertising mediums
+
+Search & filters (location, price, size, type, availability)
+
+Compare media
+
+Save favorites
+
+Book media
+
+Chat with sellers
+
+Payment gateway
+
+Digital Audit system
+
+Booking history
+
+Notifications
+
+Buyer can browse all media types:
+
+Billboards
+
+Digital screens
+
+Indoor mall screens
+
+Outdoor hoardings
+
+Airport media
+
+Metro media
+
+Bus/taxi branding
+
+Shop branding
+
+LED trucks
+
+Event branding
+
+Second‑hand advertising mediums
+
+🔴 SELLER PORTAL (Media Owner Portal)
+
+Seller Dashboard must include:
+
+Add media listings
+
+Upload photos & videos
+
+Add location map
+
+Add price & availability
+
+Manage listings
+
+View inquiries
+
+Chat with buyers
+
+Analytics (views, clicks, impressions)
+
+Keyword tracking (Premium plan)
+
+Customer comments
+
+Featured billboard management
+
+Subscription management
+
+Payment & earnings dashboard
+
+Seller can list all advertising mediums:
+
+Billboards
+
+Digital screens
+
+Indoor/outdoor media
+
+Transit media
+
+Mall media
+
+Airport media
+
+Shop branding
+
+Event branding
+
+Second‑hand advertising mediums
+
+💳 PRICING PLANS (Include in WebApp)
+
+REGULAR — FREE
+
+Free media listing
+
+Basic photo/video uploads
+
+Customer comments
+
+MEDIUM — $8/month
+
+All Regular features
+
+Medium analytics
+
+15GB storage
+
+WhatsApp alerts
+
+Payment facility
+
+Feature up to 3 billboards
+
+PREMIUM — $12/month
+
+All Medium features
+
+Unlimited listings
+
+Full analytics + keyword tracking
+
+View customer IDs
+
+Message potential clients
+
+Unlimited featured billboards
+
+Manage customer comments
+
+🧩 ADMIN PANEL (Super Admin Dashboard)
+
+Admin must be able to:
+
+Manage users
+
+Approve listings
+
+Verify sellers
+
+View marketplace analytics
+
+Manage subscriptions
+
+Handle disputes
+
+Monitor revenue
+
+Detect fraud
+
+🎨 UI/UX Requirements
+
+Matte premium red theme
+
+Clean, modern marketplace layout
+
+Smooth animations
+
+Mobile‑first responsive design
+
+Easy onboarding
+
+Simple dashboards
+
+Google Maps integration
+
+Charts for analytics
+
+⚙️ Technical Requirements
+
+Unified authentication
+
+Role‑based access (Buyer/Seller/Admin)
+
+Real‑time chat
+
+Media uploads
+
+Payment gateway
+
+Analytics tracking
+
+Scalable backend
+
+API‑ready architecture
+
+❤️ FINAL INSTRUCTION
+
+Make the WebApp lovable, premium, and extremely easy to use — a global marketplace for buying and selling all advertising mediums. Build everything fully functional, not just UI.
+
+If you want, I can also generate:
+
+Database Schema
+
+API Endpoints
+
+UI Wireframes
+
+Landing Page Content
+
+Just tap one.
+
+This project was built with [Lovable](https://lovable.dev).
+
+**Live app**: https://markatads.lovable.app
+
+## Build with Lovable
+
+Continue developing this project in the [Lovable editor](https://lovable.dev/projects/eba5642e-0bb8-4b33-9941-c4cd8a4542a4).
+
+- **Ship faster**: describe what you want to build and Lovable handles the code.
+- **Stay in sync**: every change made in Lovable is committed straight to this repository.
+- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
+
+## Development
+
+Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+
+```sh
+git clone <this-repository-url>
+cd <repository-name>
+npm i
+npm run dev
+```
