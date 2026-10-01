@@ -1,0 +1,15 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "markatads",
+  "compatibility_date": "2026-09-30",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "pages_build_output_dir": "dist",
+  "routes": [
+    {
+      "pattern": "*markatads.com/*",
+      "custom_domain": true
+    }
+  ]
+}

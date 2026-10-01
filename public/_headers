@@ -1,0 +1,17 @@
+# Performance and Security Headers for Cloudflare Pages & Custom Domain
+/*
+  X-Frame-Options: SAMEORIGIN
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(self)
+
+# Immutable long-term caching for hashed build assets
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Short caching for HTML to guarantee instant updates on git push
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate

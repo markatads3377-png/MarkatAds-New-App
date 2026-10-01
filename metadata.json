@@ -1,0 +1,6 @@
+{
+  "name": "Mark@Ads - Global Advertising Media Marketplace",
+  "description": "Global marketplace connecting advertisers and media owners to buy, sell, compare, and book billboards, DOOH screens, transit, mall, and airport advertising spaces.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
