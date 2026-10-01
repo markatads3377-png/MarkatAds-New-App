@@ -26,12 +26,23 @@ jobs:
           cache: 'npm'
 
       - name: Install Project Dependencies
-        run: npm ci || npm install
+        run: npm install --legacy-peer-deps
 
       - name: Build Optimized Production Bundle
         run: npm run build
 
-      - name: Publish to Cloudflare Pages
+      - name: Check Cloudflare Credentials
+        id: check_creds
+        run: |
+          if [ -n "${{ secrets.CLOUDFLARE_API_TOKEN }}" ]; then
+            echo "has_token=true" >> $GITHUB_OUTPUT
+          else
+            echo "::warning title=Cloudflare Credentials Notice::CLOUDFLARE_API_TOKEN secret is not set in GitHub Secrets. For automated CI/CD push, add CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID in Repository Settings > Secrets > Actions. Alternatively, connect this repository directly in the Cloudflare Dashboard under Workers & Pages > Create > Pages > Connect to Git."
+            echo "has_token=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Publish to Cloudflare Pages via Wrangler
+        if: steps.check_creds.outputs.has_token == 'true'
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
