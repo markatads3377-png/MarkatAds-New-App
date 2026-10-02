@@ -6,6 +6,9 @@
     "nodejs_compat"
   ],
   "pages_build_output_dir": "dist",
+  "vars": {
+    "NODE_VERSION": "20"
+  },
   "routes": [
     {
       "pattern": "*markatads.com/*",
