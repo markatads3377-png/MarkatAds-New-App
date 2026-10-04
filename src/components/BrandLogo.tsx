@@ -11,6 +11,7 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
   size = 'md',
   variant = 'full',
 }) => {
+  // Use the authentic original logo PNG directly
   if (variant === 'icon' || variant === 'mark') {
     const sizeClasses = {
       sm: 'size-7',
@@ -21,17 +22,14 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
 
     return (
       <img
-        src="/favicon.svg"
-        alt="Mark@Ads Logo Icon"
-        className={`${sizeClasses} object-contain rounded-xl shadow-xs transition-transform duration-200 group-hover:scale-105 ${className}`}
-        onError={(e) => {
-          e.currentTarget.src = '/favicon.png';
-        }}
+        src="/logo.png"
+        alt="Mark@Ads Official Logo"
+        className={`${sizeClasses} object-contain transition-transform duration-200 group-hover:scale-105 ${className}`}
       />
     );
   }
 
-  // Full logo
+  // Full logo display
   const heightClasses = {
     sm: 'h-8',
     md: 'h-10',
@@ -42,12 +40,9 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
   return (
     <div className={`flex items-center gap-2.5 ${className}`}>
       <img
-        src="/logo.svg"
-        alt="Mark@Ads"
+        src="/logo.png"
+        alt="Mark@Ads Official Logo"
         className={`${heightClasses} w-auto object-contain transition-transform duration-200 group-hover:scale-105`}
-        onError={(e) => {
-          e.currentTarget.src = '/logo.png';
-        }}
       />
     </div>
   );
