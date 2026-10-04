@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { useApp, CURRENCIES } from '../context/AppContext';
 import { CurrencyCode } from '../types';
+import { BrandLogo } from './BrandLogo';
 
 export const SiteHeader: React.FC = () => {
   const {
@@ -78,9 +79,7 @@ export const SiteHeader: React.FC = () => {
               onClick={() => setCurrentView('home')}
               className="flex items-center gap-2.5 group cursor-pointer text-left"
             >
-              <div className="size-9 rounded-full bg-[#C62828] text-white font-bold text-xs grid place-items-center shadow-xs">
-                MA
-              </div>
+              <BrandLogo variant="mark" size="md" />
               <div className="hidden sm:block">
                 <span className="font-display text-base font-black tracking-tight text-neutral-900 block leading-tight">
                   Mark@Ads
@@ -241,9 +240,7 @@ export const SiteHeader: React.FC = () => {
             {/* Header */}
             <div className="p-5 border-b border-neutral-100 flex items-center justify-between bg-neutral-50/50">
               <div className="flex items-center gap-2.5">
-                <div className="size-9 rounded-full bg-[#C62828] text-white font-bold text-xs grid place-items-center shadow-xs">
-                  MA
-                </div>
+                <BrandLogo variant="mark" size="md" />
                 <div>
                   <span className="font-display text-base font-bold text-neutral-900 block leading-tight">
                     Mark@Ads

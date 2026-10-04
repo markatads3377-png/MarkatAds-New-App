@@ -17,6 +17,7 @@ import { OrdersTrackerModal } from './components/OrdersTrackerModal';
 import { CloudflareDeploymentModal } from './components/CloudflareDeploymentModal';
 import { Toaster } from 'sonner';
 import { Cloud, GitBranch, ShieldCheck } from 'lucide-react';
+import { BrandLogo } from './components/BrandLogo';
 
 function AppContent() {
   const { currentView, setCurrentView, setIsDeployModalOpen } = useApp();
@@ -42,9 +43,7 @@ function AppContent() {
         <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
           <div className="space-y-3 lg:col-span-2">
             <div className="flex items-center gap-2.5">
-              <span className="grid size-8 place-items-center rounded-xl font-display text-xs font-black text-white bg-[#C62828] shadow-xs">
-                MA
-              </span>
+              <BrandLogo variant="mark" size="sm" />
               <span className="font-display text-base font-black tracking-tight text-neutral-900">
                 Mark@Ads
               </span>
