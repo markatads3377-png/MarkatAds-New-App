@@ -5,14 +5,8 @@
   "compatibility_flags": [
     "nodejs_compat"
   ],
-  "pages_build_output_dir": "dist",
-  "vars": {
-    "NODE_VERSION": "20"
-  },
-  "routes": [
-    {
-      "pattern": "*markatads.com/*",
-      "custom_domain": true
-    }
-  ]
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "single-page-application"
+  }
 }

@@ -22,13 +22,12 @@ jobs:
       - name: Setup Node.js Environment
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: 'npm'
+          node-version: 22
 
       - name: Install Project Dependencies
         run: npm install --legacy-peer-deps
 
-      - name: Build Optimized Production Bundle
+      - name: Build Production WebApp
         run: npm run build
 
       - name: Check Cloudflare Credentials
@@ -37,7 +36,7 @@ jobs:
           if [ -n "${{ secrets.CLOUDFLARE_API_TOKEN }}" ]; then
             echo "has_token=true" >> $GITHUB_OUTPUT
           else
-            echo "::warning title=Cloudflare Credentials Notice::CLOUDFLARE_API_TOKEN secret is not set in GitHub Secrets. For automated CI/CD push, add CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID in Repository Settings > Secrets > Actions. Alternatively, connect this repository directly in the Cloudflare Dashboard under Workers & Pages > Create > Pages > Connect to Git."
+            echo "::notice title=Deployment Notice::Build succeeded! For automated Cloudflare push via GitHub Actions, add CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID in Repository Settings > Secrets > Actions. Or connect this repo directly in Cloudflare Pages dashboard."
             echo "has_token=false" >> $GITHUB_OUTPUT
           fi
 
