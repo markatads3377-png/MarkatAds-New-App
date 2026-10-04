@@ -24,6 +24,7 @@ import { useApp } from '../context/AppContext';
 import { Listing } from '../types';
 import { ListingCard } from './ListingCard';
 import { toast } from 'sonner';
+import heroSkylineImage from '../assets/images/ooh_city_hero_1790793829648.jpg';
 
 export const HomeView: React.FC = () => {
   const { catalog, setCurrentView, setSelectedListingForDetail, formatMoney, setIsDeployModalOpen } = useApp();
@@ -127,7 +128,11 @@ export const HomeView: React.FC = () => {
         <div className="relative min-h-[480px] sm:min-h-[520px] lg:min-h-[540px] w-full flex flex-col justify-between p-6 sm:p-10 lg:p-12">
           {/* Panoramic Skyline Image with waterfront and large Rolex/Brand DOOH display */}
           <img
-            src="/src/assets/images/ooh_city_hero_1790793829648.jpg"
+            src={heroSkylineImage}
+            onError={(e) => {
+              // Graceful fallback to public asset path if ever needed
+              e.currentTarget.src = '/images/ooh_city_hero.jpg';
+            }}
             alt="Global city skyline at dusk with giant curved digital billboard overlooking waterfront"
             className="absolute inset-0 size-full object-cover object-center"
             referrerPolicy="no-referrer"
