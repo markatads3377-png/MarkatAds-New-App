@@ -437,7 +437,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         // ignore
       }
     }
-    return DEMO_USERS.buyer;
+    return null;
   });
 
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState<boolean>(() => {
@@ -458,9 +458,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Session
   const [role, setRole] = useState<Role>(currentUser?.role || 'buyer');
-  const [username, setUsername] = useState(currentUser?.email.split('@')[0] || 'markatads_buyer');
-  const [displayName, setDisplayName] = useState(currentUser?.name || 'Mark@Ads Partner');
-  const [company, setCompany] = useState(currentUser?.company || 'Apex Global Brands');
+  const [username, setUsername] = useState(currentUser?.email.split('@')[0] || 'guest');
+  const [displayName, setDisplayName] = useState(currentUser?.name || 'Guest');
+  const [company, setCompany] = useState(currentUser?.company || 'Advertiser');
   const [currentView, setCurrentView] = useState<'home' | 'browse' | 'buyer' | 'seller' | 'admin' | 'feed' | 'pricing' | 'deployment'>('home');
 
   const isLoggedIn = currentUser !== null;
