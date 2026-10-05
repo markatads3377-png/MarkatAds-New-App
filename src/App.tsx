@@ -100,21 +100,17 @@ function AppContent() {
                   Media Owner Operating System
                 </button>
               </li>
-              <li>
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (isAdminAuthenticated) {
-                      setCurrentView('admin');
-                    } else {
-                      setIsAdminUnlockModalOpen(true);
-                    }
-                  }}
-                  className="hover:text-neutral-900"
-                >
-                  Master Operations Admin
-                </button>
-              </li>
+              {isAdminAuthenticated && (
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => setCurrentView('admin')}
+                    className="hover:text-neutral-900 text-[#C62828] font-semibold"
+                  >
+                    Master Operations Admin
+                  </button>
+                </li>
+              )}
             </ul>
           </div>
 

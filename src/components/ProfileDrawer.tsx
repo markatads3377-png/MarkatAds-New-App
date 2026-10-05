@@ -259,7 +259,7 @@ export const ProfileDrawer: React.FC = () => {
                     </button>
 
                     {/* Master Admin Button - ONLY IF ADMIN AUTHENTICATED */}
-                    {isAdminAuthenticated ? (
+                    {isAdminAuthenticated && (
                       <div className="space-y-1">
                         <button
                           type="button"
@@ -295,22 +295,6 @@ export const ProfileDrawer: React.FC = () => {
                           <span>Lock Admin Console (Hide from view)</span>
                         </button>
                       </div>
-                    ) : (
-                      /* Secret / subtle link for owner to unlock admin mode */
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setIsProfileDrawerOpen(false);
-                          setIsAdminUnlockModalOpen(true);
-                        }}
-                        className="w-full p-2.5 rounded-xl border border-dashed border-neutral-300 hover:border-neutral-400 bg-neutral-50/50 hover:bg-neutral-50 text-xs font-semibold text-neutral-600 flex items-center justify-between transition-colors cursor-pointer"
-                      >
-                        <div className="flex items-center gap-2">
-                          <KeyRound className="size-3.5 text-neutral-500" />
-                          <span>Owner: Unlock Admin Panel</span>
-                        </div>
-                        <span className="text-[10px] text-neutral-400">Passcode Required</span>
-                      </button>
                     )}
                   </div>
                 </div>
@@ -422,7 +406,7 @@ export const ProfileDrawer: React.FC = () => {
                     Not Signed In
                   </h3>
                   <p className="text-xs text-neutral-500 max-w-xs mx-auto">
-                    Sign in to access your individual campaign flights, manage media spaces, or authenticate as master administrator.
+                    Sign in to access your individual campaign flights, track live sightings, and manage media spaces.
                   </p>
                 </div>
 
@@ -437,17 +421,6 @@ export const ProfileDrawer: React.FC = () => {
                   >
                     <LogIn className="size-4" />
                     <span>Sign In / Create Account</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsProfileDrawerOpen(false);
-                      setIsAdminUnlockModalOpen(true);
-                    }}
-                    className="w-full py-2 px-4 rounded-xl border border-neutral-200 hover:bg-neutral-50 text-neutral-700 font-semibold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
-                  >
-                    <ShieldCheck className="size-3.5 text-[#C62828]" />
-                    <span>Admin Clearance Login</span>
                   </button>
                 </div>
               </div>

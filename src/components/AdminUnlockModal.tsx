@@ -113,25 +113,6 @@ export const AdminUnlockModal: React.FC = () => {
             <span>Unlock Admin Operations</span>
           </button>
         </form>
-
-        {/* 1-Click Owner Authorization */}
-        <div className="mt-5 pt-5 border-t border-neutral-800/80 space-y-2">
-          <div className="text-[11px] font-semibold text-neutral-400 flex items-center justify-between">
-            <span>Primary Platform Owner:</span>
-            <span className="text-neutral-300 font-mono">markatads3377@gmail.com</span>
-          </div>
-          <button
-            type="button"
-            onClick={handleQuickAuthorizeOwner}
-            className="w-full py-2.5 px-3 rounded-xl border border-neutral-700 hover:border-neutral-600 bg-neutral-800/40 hover:bg-neutral-800 text-xs font-semibold text-neutral-200 flex items-center justify-center gap-2 transition-colors cursor-pointer"
-          >
-            <Sparkles className="size-3.5 text-amber-400" />
-            <span>1-Click Authorize as markatads3377@gmail.com</span>
-          </button>
-          <p className="text-[10px] text-neutral-500 text-center">
-            Default emergency master key: <code className="text-neutral-400">markatads2026</code>
-          </p>
-        </div>
       </div>
     </div>
   );

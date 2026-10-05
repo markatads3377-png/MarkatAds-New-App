@@ -122,7 +122,7 @@ export const AuthModal: React.FC = () => {
             {activeTab === 'signin' ? 'Sign into your individual account' : 'Create your Mark@Ads account'}
           </h2>
           <p className="text-xs text-neutral-400 mt-1">
-            Access your campaigns, manage media spaces, or authenticate as master administrator.
+            Access your campaigns, manage media spaces, and book verified advertising inventory.
           </p>
 
           {/* Tab Switcher */}
@@ -156,47 +156,41 @@ export const AuthModal: React.FC = () => {
 
         {/* Modal Body */}
         <div className="p-6 sm:p-7 space-y-6">
-          {/* Quick Demo Switcher */}
+          {/* Quick Demo Switcher - ONLY PUBLIC USER ROLES (NO MASTER ADMIN) */}
           <div className="space-y-2">
             <div className="flex items-center justify-between text-[11px] font-bold text-neutral-500 uppercase tracking-wider">
-              <span>1-Click Instant Sign In:</span>
-              <span className="text-emerald-600 font-medium">Ready</span>
+              <span>Quick Demo Profiles:</span>
+              <span className="text-neutral-400 font-medium">Instant Access</span>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('admin')}
-                className="p-2.5 rounded-xl border border-red-200/80 bg-red-50/50 hover:bg-red-50 text-left transition-colors cursor-pointer group"
-              >
-                <div className="flex items-center gap-1.5 text-xs font-bold text-[#C62828] mb-0.5">
-                  <ShieldCheck className="size-3.5 text-[#C62828]" />
-                  <span>Master Admin</span>
-                </div>
-                <div className="text-[10px] text-neutral-500 truncate">markatads3377@...</div>
-              </button>
-
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               <button
                 type="button"
                 onClick={() => handleQuickLogin('buyer')}
-                className="p-2.5 rounded-xl border border-blue-200/80 bg-blue-50/50 hover:bg-blue-50 text-left transition-colors cursor-pointer group"
+                className="p-3 rounded-xl border border-blue-200/80 bg-blue-50/50 hover:bg-blue-50 text-left transition-colors cursor-pointer group flex items-center justify-between"
               >
-                <div className="flex items-center gap-1.5 text-xs font-bold text-blue-700 mb-0.5">
-                  <ShoppingBag className="size-3.5 text-blue-600" />
-                  <span>Advertiser</span>
+                <div>
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-blue-700 mb-0.5">
+                    <ShoppingBag className="size-3.5 text-blue-600" />
+                    <span>Advertiser / Buyer</span>
+                  </div>
+                  <div className="text-[11px] text-neutral-500">Alex Morgan (Brand Global)</div>
                 </div>
-                <div className="text-[10px] text-neutral-500 truncate">Alex Morgan (Buyer)</div>
+                <ArrowRight className="size-3.5 text-blue-500 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
               </button>
 
               <button
                 type="button"
                 onClick={() => handleQuickLogin('seller')}
-                className="p-2.5 rounded-xl border border-amber-200/80 bg-amber-50/50 hover:bg-amber-50 text-left transition-colors cursor-pointer group"
+                className="p-3 rounded-xl border border-amber-200/80 bg-amber-50/50 hover:bg-amber-50 text-left transition-colors cursor-pointer group flex items-center justify-between"
               >
-                <div className="flex items-center gap-1.5 text-xs font-bold text-amber-700 mb-0.5">
-                  <Building2 className="size-3.5 text-amber-600" />
-                  <span>Media Owner</span>
+                <div>
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-amber-700 mb-0.5">
+                    <Building2 className="size-3.5 text-amber-600" />
+                    <span>Media Owner / Seller</span>
+                  </div>
+                  <div className="text-[11px] text-neutral-500">Al-Khaleej Outdoor Network</div>
                 </div>
-                <div className="text-[10px] text-neutral-500 truncate">Al-Khaleej (Seller)</div>
+                <ArrowRight className="size-3.5 text-amber-500 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
               </button>
             </div>
           </div>
@@ -204,7 +198,7 @@ export const AuthModal: React.FC = () => {
           <div className="relative flex items-center justify-center">
             <div className="border-t border-neutral-200 w-full" />
             <span className="bg-white px-3 text-[11px] font-bold text-neutral-400 uppercase tracking-wider absolute">
-              or enter credentials
+              or sign in with email
             </span>
           </div>
 
