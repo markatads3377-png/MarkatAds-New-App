@@ -1,7 +1,0 @@
-# Cloudflare Pages & Static Assets Redirects
-http://www.markatads.com/* https://markatads.com/:splat 301
-https://www.markatads.com/* https://markatads.com/:splat 301
-http://markatads.com/* https://markatads.com/:splat 301
-
-# Single Page App routing
-/* /index.html 200
