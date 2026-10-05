@@ -5,10 +5,6 @@
   "compatibility_flags": [
     "nodejs_compat"
   ],
-  "routes": [
-    { "pattern": "markatads.com", "custom_domain": true },
-    { "pattern": "www.markatads.com", "custom_domain": true }
-  ],
   "assets": {
     "directory": "./dist",
     "not_found_handling": "single-page-application"
