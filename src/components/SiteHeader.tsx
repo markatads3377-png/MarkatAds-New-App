@@ -23,6 +23,7 @@ import {
   LogIn,
   LogOut,
   User,
+  UserPlus,
 } from 'lucide-react';
 import { useApp, CURRENCIES } from '../context/AppContext';
 import { CurrencyCode } from '../types';
@@ -39,6 +40,7 @@ export const SiteHeader: React.FC = () => {
     isAdminAuthenticated,
     setIsProfileDrawerOpen,
     setIsAuthModalOpen,
+    openAuthModal,
     logout,
     displayName,
     selectedCurrency,
@@ -237,14 +239,24 @@ export const SiteHeader: React.FC = () => {
                 )}
               </button>
             ) : (
-              <button
-                type="button"
-                onClick={() => setIsAuthModalOpen(true)}
-                className="h-9 px-3.5 rounded-full bg-[#C62828] hover:bg-[#B71C1C] text-white font-bold text-xs flex items-center gap-1.5 shadow-xs transition-transform active:scale-95 cursor-pointer ml-0.5"
-              >
-                <LogIn className="size-3.5" />
-                <span>Sign In</span>
-              </button>
+              <div className="flex items-center gap-1.5 ml-1">
+                <button
+                  type="button"
+                  onClick={() => openAuthModal('signin')}
+                  className="h-8.5 px-3 rounded-full hover:bg-neutral-100 text-neutral-700 hover:text-neutral-900 font-bold text-xs transition-colors cursor-pointer"
+                >
+                  Sign In
+                </button>
+                <button
+                  type="button"
+                  onClick={() => openAuthModal('register')}
+                  className="h-8.5 px-3.5 rounded-full bg-[#C62828] hover:bg-[#B71C1C] text-white font-bold text-xs flex items-center gap-1.5 shadow-2xs transition-transform active:scale-95 cursor-pointer"
+                >
+                  <UserPlus className="size-3.5" />
+                  <span className="hidden sm:inline">Create Account</span>
+                  <span className="sm:hidden">Sign Up</span>
+                </button>
+              </div>
             )}
           </div>
         </div>
@@ -439,17 +451,30 @@ export const SiteHeader: React.FC = () => {
                     </button>
                   </>
                 ) : (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsSidebarOpen(false);
-                      setIsAuthModalOpen(true);
-                    }}
-                    className="w-full flex items-center gap-3 px-3.5 py-2 rounded-xl text-[#C62828] bg-red-50 hover:bg-red-100 font-bold"
-                  >
-                    <LogIn className="size-4 text-[#C62828]" />
-                    <span>Sign In to Your Profile</span>
-                  </button>
+                  <div className="space-y-1.5">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsSidebarOpen(false);
+                        openAuthModal('signin');
+                      }}
+                      className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-neutral-800 bg-neutral-100 hover:bg-neutral-200 font-bold transition-colors cursor-pointer"
+                    >
+                      <LogIn className="size-4 text-[#C62828]" />
+                      <span>Sign In to Your Profile</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsSidebarOpen(false);
+                        openAuthModal('register');
+                      }}
+                      className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-white bg-[#C62828] hover:bg-[#B71C1C] font-bold shadow-xs transition-colors cursor-pointer"
+                    >
+                      <UserPlus className="size-4 text-white" />
+                      <span>Create Account (+100 Coins)</span>
+                    </button>
+                  </div>
                 )}
               </div>
 

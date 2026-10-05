@@ -1,18 +1,24 @@
 export type Role = 'buyer' | 'seller' | 'admin';
 
-export interface UserProfile {
+export interface UserAccount {
   id: string;
   name: string;
   email: string;
+  password?: string;
   role: Role;
   isAdmin: boolean;
   company?: string;
   phone?: string;
   avatarUrl?: string;
   bio?: string;
-  walletBalance?: number;
-  joinedDate?: string;
+  walletBalance: number;
+  joinedDate: string;
+  authProvider: 'email' | 'google';
+  twoFactorEnabled?: boolean;
+  lastLogin?: string;
 }
+
+export interface UserProfile extends Omit<UserAccount, 'password'> {}
 
 export type MediumType =
   | 'billboard'

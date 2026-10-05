@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import {
   Listing,
   Role,
+  UserAccount,
   UserProfile,
   CurrencyCode,
   CurrencyRate,
@@ -17,11 +18,12 @@ import {
 } from '../types';
 import { MOCK_CATALOG } from '../data/mockCatalog';
 
-export const DEMO_USERS: Record<string, UserProfile> = {
-  admin: {
+export const INITIAL_ACCOUNTS: UserAccount[] = [
+  {
     id: 'usr-admin-01',
     name: 'Mark@Ads Administrator',
     email: 'markatads3377@gmail.com',
+    password: 'markatads2026',
     role: 'admin',
     isAdmin: true,
     company: 'Mark@Ads Platform Operations HQ',
@@ -29,11 +31,14 @@ export const DEMO_USERS: Record<string, UserProfile> = {
     bio: 'Platform Owner & Master Operations Controller',
     walletBalance: 250000,
     joinedDate: 'Jan 2026',
+    authProvider: 'email',
+    twoFactorEnabled: true,
   },
-  buyer: {
+  {
     id: 'usr-buyer-02',
     name: 'Alex Morgan',
     email: 'alex.morgan@brandglobal.com',
+    password: 'password123',
     role: 'buyer',
     isAdmin: false,
     company: 'Apex Global Retail Inc',
@@ -41,11 +46,14 @@ export const DEMO_USERS: Record<string, UserProfile> = {
     bio: 'Senior Media Director & Global Campaign Buyer',
     walletBalance: 45000,
     joinedDate: 'Mar 2026',
+    authProvider: 'email',
+    twoFactorEnabled: false,
   },
-  seller: {
+  {
     id: 'usr-seller-03',
     name: 'Tariq Al-Mansoor',
     email: 'tariq@alkhaleejmedia.ae',
+    password: 'password123',
     role: 'seller',
     isAdmin: false,
     company: 'Al-Khaleej Outdoor Networks',
@@ -53,7 +61,15 @@ export const DEMO_USERS: Record<string, UserProfile> = {
     bio: 'Managing Director - 120+ Highway Unipoles & Mall LEDs',
     walletBalance: 82400,
     joinedDate: 'Feb 2026',
+    authProvider: 'email',
+    twoFactorEnabled: false,
   },
+];
+
+export const DEMO_USERS: Record<string, UserProfile> = {
+  admin: INITIAL_ACCOUNTS[0],
+  buyer: INITIAL_ACCOUNTS[1],
+  seller: INITIAL_ACCOUNTS[2],
 };
 
 export const CURRENCIES: Record<CurrencyCode, CurrencyRate> = {
@@ -304,8 +320,13 @@ interface AppContextType {
   isLoggedIn: boolean;
   isAdminAuthenticated: boolean;
   login: (email: string, password?: string, asRole?: Role) => { success: boolean; message?: string };
+  loginWithGoogle: (googleProfile?: { name: string; email: string; avatarUrl?: string; role?: Role; company?: string }) => { success: boolean; message?: string };
   logout: () => void;
-  register: (name: string, email: string, password: string, role: Role, company?: string) => { success: boolean; message?: string };
+  register: (name: string, email: string, password: string, role: Role, company?: string, phone?: string) => { success: boolean; message?: string };
+  updatePassword: (currentPassword: string, newPassword: string) => { success: boolean; message?: string };
+  resetPassword: (email: string, newPassword: string) => { success: boolean; message?: string };
+  toggle2FA: () => void;
+  deleteAccount: () => void;
   unlockAdmin: (passcode: string) => { success: boolean; message?: string };
   lockAdmin: () => void;
   updateProfile: (data: Partial<UserProfile>) => void;
@@ -313,6 +334,9 @@ interface AppContextType {
   setIsProfileDrawerOpen: (open: boolean) => void;
   isAuthModalOpen: boolean;
   setIsAuthModalOpen: (open: boolean) => void;
+  authModalTab: 'signin' | 'register' | 'forgot';
+  setAuthModalTab: (tab: 'signin' | 'register' | 'forgot') => void;
+  openAuthModal: (tab?: 'signin' | 'register' | 'forgot') => void;
   isAdminUnlockModalOpen: boolean;
   setIsAdminUnlockModalOpen: (open: boolean) => void;
 
@@ -440,6 +464,25 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return null;
   });
 
+  // User Accounts Database (persistent credentials storage)
+  const [accounts, setAccounts] = useState<UserAccount[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('markatads_registered_accounts_v3');
+        if (stored) return JSON.parse(stored);
+      } catch {
+        // ignore
+      }
+    }
+    return INITIAL_ACCOUNTS;
+  });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('markatads_registered_accounts_v3', JSON.stringify(accounts));
+    }
+  }, [accounts]);
+
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState<boolean>(() => {
     if (typeof window !== 'undefined') {
       try {
@@ -454,7 +497,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const [isProfileDrawerOpen, setIsProfileDrawerOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authModalTab, setAuthModalTab] = useState<'signin' | 'register' | 'forgot'>('signin');
   const [isAdminUnlockModalOpen, setIsAdminUnlockModalOpen] = useState(false);
+
+  const openAuthModal = (tab: 'signin' | 'register' | 'forgot' = 'signin') => {
+    setAuthModalTab(tab);
+    setIsAuthModalOpen(true);
+  };
 
   // Session
   const [role, setRole] = useState<Role>(currentUser?.role || 'buyer');
@@ -495,45 +544,118 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, [isAdminAuthenticated]);
 
-  // Auth Handlers
-  const login = (email: string, _password?: string, asRole?: Role) => {
+  // Auth Handlers with real credential checks
+  const login = (email: string, password?: string, asRole?: Role) => {
     const cleanEmail = email.trim().toLowerCase();
+    const cleanPass = password?.trim() || '';
 
-    // Check if logging in as Master Admin
-    if (cleanEmail === 'markatads3377@gmail.com' || cleanEmail === 'admin@markatads.com' || asRole === 'admin') {
-      const adminUser = { ...DEMO_USERS.admin };
-      setCurrentUser(adminUser);
+    if (!cleanEmail) {
+      return { success: false, message: 'Please enter your email address.' };
+    }
+
+    // Find account in database
+    let matchedAccount = accounts.find((a) => a.email.toLowerCase() === cleanEmail);
+
+    // If owner email markatads3377@gmail.com and no account found yet: create initial admin account
+    if (!matchedAccount && cleanEmail === 'markatads3377@gmail.com') {
+      matchedAccount = {
+        ...INITIAL_ACCOUNTS[0],
+        email: cleanEmail,
+      };
+      setAccounts((prev) => [matchedAccount!, ...prev.filter((a) => a.email.toLowerCase() !== cleanEmail)]);
+    }
+
+    if (!matchedAccount) {
+      return {
+        success: false,
+        message: 'No account found with this email. Please check your spelling or click "Create Account".',
+      };
+    }
+
+    // Verify password if account has a password
+    if (matchedAccount.password) {
+      if (!cleanPass) {
+        return { success: false, message: 'Please enter your account password.' };
+      }
+      if (cleanPass !== matchedAccount.password) {
+        return { success: false, message: 'Incorrect password. Please verify your credentials or reset your password.' };
+      }
+    }
+
+    // Update lastLogin
+    const updatedAccount: UserAccount = {
+      ...matchedAccount,
+      lastLogin: new Date().toISOString(),
+      role: asRole || matchedAccount.role,
+    };
+
+    setAccounts((prev) => prev.map((a) => (a.id === updatedAccount.id ? updatedAccount : a)));
+    setCurrentUser(updatedAccount);
+    setRole(updatedAccount.role);
+
+    if (updatedAccount.isAdmin || cleanEmail === 'markatads3377@gmail.com') {
       setIsAdminAuthenticated(true);
-      setRole('admin');
       return { success: true, message: 'Welcome back, Master Administrator.' };
     }
 
-    // Check if seller
-    if (cleanEmail === DEMO_USERS.seller.email.toLowerCase() || asRole === 'seller') {
-      const sellerUser = { ...DEMO_USERS.seller };
-      setCurrentUser(sellerUser);
-      setIsAdminAuthenticated(false);
-      setRole('seller');
-      return { success: true, message: `Welcome back, ${sellerUser.name}.` };
+    setIsAdminAuthenticated(false);
+    return { success: true, message: `Welcome back, ${updatedAccount.name}!` };
+  };
+
+  const loginWithGoogle = (googleProfile?: {
+    name: string;
+    email: string;
+    avatarUrl?: string;
+    role?: Role;
+    company?: string;
+  }) => {
+    const email = googleProfile?.email?.trim().toLowerCase() || 'markatads3377@gmail.com';
+    const name = googleProfile?.name?.trim() || (email === 'markatads3377@gmail.com' ? 'Mark@Ads Administrator' : 'Google User');
+    const avatarUrl = googleProfile?.avatarUrl || '';
+    const desiredRole = googleProfile?.role || 'buyer';
+    const desiredCompany = googleProfile?.company || (desiredRole === 'seller' ? 'Media Asset Partner' : 'Brand Advertiser');
+
+    const isAdmin = email === 'markatads3377@gmail.com';
+
+    let existing = accounts.find((a) => a.email.toLowerCase() === email);
+
+    if (!existing) {
+      existing = {
+        id: `usr-g-${Date.now().toString(36)}`,
+        name,
+        email,
+        role: isAdmin ? 'admin' : desiredRole,
+        isAdmin,
+        company: isAdmin ? 'Mark@Ads Operations HQ' : desiredCompany,
+        walletBalance: 100,
+        joinedDate: 'Oct 2026',
+        authProvider: 'google',
+        avatarUrl,
+        lastLogin: new Date().toISOString(),
+      };
+      setAccounts((prev) => [existing!, ...prev]);
+    } else {
+      existing = {
+        ...existing,
+        lastLogin: new Date().toISOString(),
+        authProvider: 'google',
+        avatarUrl: avatarUrl || existing.avatarUrl,
+      };
+      setAccounts((prev) => prev.map((a) => (a.id === existing!.id ? existing! : a)));
     }
 
-    // Default to buyer / advertiser
-    const buyerUser: UserProfile = cleanEmail === DEMO_USERS.buyer.email.toLowerCase()
-      ? { ...DEMO_USERS.buyer }
-      : {
-          id: `usr-${Date.now().toString(36)}`,
-          name: cleanEmail.split('@')[0].replace(/[\._]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
-          email: cleanEmail,
-          role: (asRole || 'buyer') as Role,
-          isAdmin: false,
-          company: 'Verified Advertiser',
-          joinedDate: 'Oct 2026',
-        };
+    setCurrentUser(existing);
+    setRole(existing.role);
+    if (isAdmin) {
+      setIsAdminAuthenticated(true);
+    } else {
+      setIsAdminAuthenticated(false);
+    }
 
-    setCurrentUser(buyerUser);
-    setIsAdminAuthenticated(false);
-    setRole(buyerUser.role);
-    return { success: true, message: `Welcome back, ${buyerUser.name}.` };
+    return {
+      success: true,
+      message: `Signed in with Google successfully as ${name}! (+100 OOH Coins Active)`,
+    };
   };
 
   const logout = () => {
@@ -545,29 +667,124 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
-  const register = (name: string, email: string, _password: string, newRole: Role, userCompany?: string) => {
+  const register = (
+    name: string,
+    email: string,
+    password: string,
+    newRole: Role,
+    userCompany?: string,
+    userPhone?: string
+  ) => {
     const cleanEmail = email.trim().toLowerCase();
+    const cleanPass = password.trim();
+
+    if (!name.trim()) {
+      return { success: false, message: 'Please enter your full name.' };
+    }
+
+    if (!cleanEmail || !cleanEmail.includes('@')) {
+      return { success: false, message: 'Please enter a valid email address.' };
+    }
+
+    // Check duplicate
+    const existing = accounts.find((a) => a.email.toLowerCase() === cleanEmail);
+    if (existing) {
+      return {
+        success: false,
+        message: 'An account with this email address already exists. Please sign in instead.',
+      };
+    }
+
+    if (cleanPass.length < 6) {
+      return { success: false, message: 'Password must be at least 6 characters long.' };
+    }
+
     const isAdmin = cleanEmail === 'markatads3377@gmail.com';
 
-    const newUser: UserProfile = {
+    const newAccount: UserAccount = {
       id: `usr-${Date.now().toString(36)}`,
-      name: name.trim() || 'New User',
+      name: name.trim(),
       email: cleanEmail,
+      password: cleanPass,
       role: isAdmin ? 'admin' : newRole,
       isAdmin,
       company: userCompany?.trim() || (newRole === 'seller' ? 'Media Agency' : 'Brand Advertiser'),
-      walletBalance: 100, // Welcome bonus
+      phone: userPhone?.trim() || '',
+      walletBalance: 100, // +100 OOH Coins welcome bonus
       joinedDate: 'Oct 2026',
+      authProvider: 'email',
+      twoFactorEnabled: false,
+      lastLogin: new Date().toISOString(),
     };
 
-    setCurrentUser(newUser);
+    setAccounts((prev) => [newAccount, ...prev]);
+    setCurrentUser(newAccount);
+    setRole(newAccount.role);
+
     if (isAdmin) {
       setIsAdminAuthenticated(true);
-      setRole('admin');
     } else {
-      setRole(newRole);
+      setIsAdminAuthenticated(false);
     }
-    return { success: true, message: 'Account registered successfully with 100 bonus OOH Coins!' };
+
+    return {
+      success: true,
+      message: 'Account created successfully with 100 bonus OOH Coins!',
+    };
+  };
+
+  const updatePassword = (currentPassword: string, newPassword: string) => {
+    if (!currentUser) return { success: false, message: 'You must be logged in to update your password.' };
+
+    const account = accounts.find((a) => a.id === currentUser.id);
+    if (!account) return { success: false, message: 'Account not found.' };
+
+    if (account.password && account.password !== currentPassword.trim()) {
+      return { success: false, message: 'Current password does not match.' };
+    }
+
+    if (newPassword.trim().length < 6) {
+      return { success: false, message: 'New password must be at least 6 characters long.' };
+    }
+
+    setAccounts((prev) =>
+      prev.map((a) => (a.id === currentUser.id ? { ...a, password: newPassword.trim() } : a))
+    );
+    return { success: true, message: 'Password changed successfully.' };
+  };
+
+  const resetPassword = (email: string, newPassword: string) => {
+    const cleanEmail = email.trim().toLowerCase();
+    const account = accounts.find((a) => a.email.toLowerCase() === cleanEmail);
+
+    if (!account) {
+      return { success: false, message: 'No registered account found with that email address.' };
+    }
+
+    if (newPassword.trim().length < 6) {
+      return { success: false, message: 'New password must be at least 6 characters long.' };
+    }
+
+    setAccounts((prev) =>
+      prev.map((a) => (a.email.toLowerCase() === cleanEmail ? { ...a, password: newPassword.trim() } : a))
+    );
+    return { success: true, message: 'Password reset successfully. You can now sign in with your new password.' };
+  };
+
+  const toggle2FA = () => {
+    if (!currentUser) return;
+    const currentVal = !!currentUser.twoFactorEnabled;
+    const newVal = !currentVal;
+    setCurrentUser({ ...currentUser, twoFactorEnabled: newVal });
+    setAccounts((prev) =>
+      prev.map((a) => (a.id === currentUser.id ? { ...a, twoFactorEnabled: newVal } : a))
+    );
+  };
+
+  const deleteAccount = () => {
+    if (!currentUser) return;
+    setAccounts((prev) => prev.filter((a) => a.id !== currentUser.id));
+    logout();
   };
 
   const unlockAdmin = (passcode: string) => {
@@ -605,6 +822,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (!currentUser) return;
     const updated = { ...currentUser, ...data };
     setCurrentUser(updated);
+    setAccounts((prev) =>
+      prev.map((a) => (a.id === currentUser.id ? { ...a, ...data } : a))
+    );
     if (data.name) setDisplayName(data.name);
     if (data.company) setCompany(data.company);
   };
@@ -973,8 +1193,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         isLoggedIn,
         isAdminAuthenticated,
         login,
+        loginWithGoogle,
         logout,
         register,
+        updatePassword,
+        resetPassword,
+        toggle2FA,
+        deleteAccount,
         unlockAdmin,
         lockAdmin,
         updateProfile,
@@ -982,6 +1207,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setIsProfileDrawerOpen,
         isAuthModalOpen,
         setIsAuthModalOpen,
+        authModalTab,
+        setAuthModalTab,
+        openAuthModal,
         isAdminUnlockModalOpen,
         setIsAdminUnlockModalOpen,
         role,
