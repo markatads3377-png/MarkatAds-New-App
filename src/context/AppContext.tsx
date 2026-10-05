@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import {
   Listing,
   Role,
+  UserProfile,
   CurrencyCode,
   CurrencyRate,
   AddonServices,
@@ -15,6 +16,45 @@ import {
   CoinPerk,
 } from '../types';
 import { MOCK_CATALOG } from '../data/mockCatalog';
+
+export const DEMO_USERS: Record<string, UserProfile> = {
+  admin: {
+    id: 'usr-admin-01',
+    name: 'Mark@Ads Administrator',
+    email: 'markatads3377@gmail.com',
+    role: 'admin',
+    isAdmin: true,
+    company: 'Mark@Ads Platform Operations HQ',
+    phone: '+971 50 123 4567',
+    bio: 'Platform Owner & Master Operations Controller',
+    walletBalance: 250000,
+    joinedDate: 'Jan 2026',
+  },
+  buyer: {
+    id: 'usr-buyer-02',
+    name: 'Alex Morgan',
+    email: 'alex.morgan@brandglobal.com',
+    role: 'buyer',
+    isAdmin: false,
+    company: 'Apex Global Retail Inc',
+    phone: '+1 (555) 234-5678',
+    bio: 'Senior Media Director & Global Campaign Buyer',
+    walletBalance: 45000,
+    joinedDate: 'Mar 2026',
+  },
+  seller: {
+    id: 'usr-seller-03',
+    name: 'Tariq Al-Mansoor',
+    email: 'tariq@alkhaleejmedia.ae',
+    role: 'seller',
+    isAdmin: false,
+    company: 'Al-Khaleej Outdoor Networks',
+    phone: '+971 4 398 7654',
+    bio: 'Managing Director - 120+ Highway Unipoles & Mall LEDs',
+    walletBalance: 82400,
+    joinedDate: 'Feb 2026',
+  },
+};
 
 export const CURRENCIES: Record<CurrencyCode, CurrencyRate> = {
   USD: { code: 'USD', symbol: '$', rateAgainstUSD: 1, name: 'US Dollar ($)' },
@@ -259,6 +299,23 @@ export const INITIAL_PAYOUTS: PayoutTransaction[] = [
 ];
 
 interface AppContextType {
+  // Active User & Authentication
+  currentUser: UserProfile | null;
+  isLoggedIn: boolean;
+  isAdminAuthenticated: boolean;
+  login: (email: string, password?: string, asRole?: Role) => { success: boolean; message?: string };
+  logout: () => void;
+  register: (name: string, email: string, password: string, role: Role, company?: string) => { success: boolean; message?: string };
+  unlockAdmin: (passcode: string) => { success: boolean; message?: string };
+  lockAdmin: () => void;
+  updateProfile: (data: Partial<UserProfile>) => void;
+  isProfileDrawerOpen: boolean;
+  setIsProfileDrawerOpen: (open: boolean) => void;
+  isAuthModalOpen: boolean;
+  setIsAuthModalOpen: (open: boolean) => void;
+  isAdminUnlockModalOpen: boolean;
+  setIsAdminUnlockModalOpen: (open: boolean) => void;
+
   // Active User / Role
   role: Role;
   setRole: (r: Role) => void;
@@ -370,12 +427,187 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // User Authentication & Profile
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('markatads_auth_user_v2');
+        if (stored) return JSON.parse(stored);
+      } catch {
+        // ignore
+      }
+    }
+    return DEMO_USERS.buyer;
+  });
+
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('markatads_admin_auth_v2');
+        if (stored) return JSON.parse(stored);
+      } catch {
+        // ignore
+      }
+    }
+    return false;
+  });
+
+  const [isProfileDrawerOpen, setIsProfileDrawerOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isAdminUnlockModalOpen, setIsAdminUnlockModalOpen] = useState(false);
+
   // Session
-  const [role, setRole] = useState<Role>('buyer');
-  const [username, setUsername] = useState('markatads_buyer');
-  const [displayName, setDisplayName] = useState('Mark@Ads Partner');
-  const [company, setCompany] = useState('Apex Global Brands');
+  const [role, setRole] = useState<Role>(currentUser?.role || 'buyer');
+  const [username, setUsername] = useState(currentUser?.email.split('@')[0] || 'markatads_buyer');
+  const [displayName, setDisplayName] = useState(currentUser?.name || 'Mark@Ads Partner');
+  const [company, setCompany] = useState(currentUser?.company || 'Apex Global Brands');
   const [currentView, setCurrentView] = useState<'home' | 'browse' | 'buyer' | 'seller' | 'admin' | 'feed' | 'pricing' | 'deployment'>('home');
+
+  const isLoggedIn = currentUser !== null;
+
+  // Sync profile when currentUser updates
+  useEffect(() => {
+    if (currentUser) {
+      setDisplayName(currentUser.name);
+      setUsername(currentUser.email.split('@')[0]);
+      if (currentUser.company) setCompany(currentUser.company);
+      setRole(currentUser.role);
+      if (currentUser.isAdmin || currentUser.email.toLowerCase() === 'markatads3377@gmail.com') {
+        setIsAdminAuthenticated(true);
+      }
+    }
+  }, [currentUser]);
+
+  // Persist user & admin auth
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (currentUser) {
+        localStorage.setItem('markatads_auth_user_v2', JSON.stringify(currentUser));
+      } else {
+        localStorage.removeItem('markatads_auth_user_v2');
+      }
+    }
+  }, [currentUser]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('markatads_admin_auth_v2', JSON.stringify(isAdminAuthenticated));
+    }
+  }, [isAdminAuthenticated]);
+
+  // Auth Handlers
+  const login = (email: string, _password?: string, asRole?: Role) => {
+    const cleanEmail = email.trim().toLowerCase();
+
+    // Check if logging in as Master Admin
+    if (cleanEmail === 'markatads3377@gmail.com' || cleanEmail === 'admin@markatads.com' || asRole === 'admin') {
+      const adminUser = { ...DEMO_USERS.admin };
+      setCurrentUser(adminUser);
+      setIsAdminAuthenticated(true);
+      setRole('admin');
+      return { success: true, message: 'Welcome back, Master Administrator.' };
+    }
+
+    // Check if seller
+    if (cleanEmail === DEMO_USERS.seller.email.toLowerCase() || asRole === 'seller') {
+      const sellerUser = { ...DEMO_USERS.seller };
+      setCurrentUser(sellerUser);
+      setIsAdminAuthenticated(false);
+      setRole('seller');
+      return { success: true, message: `Welcome back, ${sellerUser.name}.` };
+    }
+
+    // Default to buyer / advertiser
+    const buyerUser: UserProfile = cleanEmail === DEMO_USERS.buyer.email.toLowerCase()
+      ? { ...DEMO_USERS.buyer }
+      : {
+          id: `usr-${Date.now().toString(36)}`,
+          name: cleanEmail.split('@')[0].replace(/[\._]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
+          email: cleanEmail,
+          role: (asRole || 'buyer') as Role,
+          isAdmin: false,
+          company: 'Verified Advertiser',
+          joinedDate: 'Oct 2026',
+        };
+
+    setCurrentUser(buyerUser);
+    setIsAdminAuthenticated(false);
+    setRole(buyerUser.role);
+    return { success: true, message: `Welcome back, ${buyerUser.name}.` };
+  };
+
+  const logout = () => {
+    setCurrentUser(null);
+    setIsAdminAuthenticated(false);
+    setRole('buyer');
+    if (currentView === 'admin' || currentView === 'seller') {
+      setCurrentView('home');
+    }
+  };
+
+  const register = (name: string, email: string, _password: string, newRole: Role, userCompany?: string) => {
+    const cleanEmail = email.trim().toLowerCase();
+    const isAdmin = cleanEmail === 'markatads3377@gmail.com';
+
+    const newUser: UserProfile = {
+      id: `usr-${Date.now().toString(36)}`,
+      name: name.trim() || 'New User',
+      email: cleanEmail,
+      role: isAdmin ? 'admin' : newRole,
+      isAdmin,
+      company: userCompany?.trim() || (newRole === 'seller' ? 'Media Agency' : 'Brand Advertiser'),
+      walletBalance: 100, // Welcome bonus
+      joinedDate: 'Oct 2026',
+    };
+
+    setCurrentUser(newUser);
+    if (isAdmin) {
+      setIsAdminAuthenticated(true);
+      setRole('admin');
+    } else {
+      setRole(newRole);
+    }
+    return { success: true, message: 'Account registered successfully with 100 bonus OOH Coins!' };
+  };
+
+  const unlockAdmin = (passcode: string) => {
+    const clean = passcode.trim();
+    if (
+      clean === 'markatads2026' ||
+      clean === 'admin' ||
+      clean === 'markatads' ||
+      clean === 'markatads3377' ||
+      clean === 'admin123'
+    ) {
+      setIsAdminAuthenticated(true);
+      if (currentUser) {
+        setCurrentUser({ ...currentUser, isAdmin: true });
+      } else {
+        setCurrentUser(DEMO_USERS.admin);
+      }
+      setRole('admin');
+      return { success: true, message: 'Admin operations clearance unlocked.' };
+    }
+    return { success: false, message: 'Incorrect administrator authorization passcode.' };
+  };
+
+  const lockAdmin = () => {
+    setIsAdminAuthenticated(false);
+    if (role === 'admin') {
+      setRole('buyer');
+      if (currentView === 'admin') {
+        setCurrentView('home');
+      }
+    }
+  };
+
+  const updateProfile = (data: Partial<UserProfile>) => {
+    if (!currentUser) return;
+    const updated = { ...currentUser, ...data };
+    setCurrentUser(updated);
+    if (data.name) setDisplayName(data.name);
+    if (data.company) setCompany(data.company);
+  };
 
   // Currency
   const [selectedCurrency, setSelectedCurrency] = useState<CurrencyCode>('USD');
@@ -737,6 +969,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   return (
     <AppContext.Provider
       value={{
+        currentUser,
+        isLoggedIn,
+        isAdminAuthenticated,
+        login,
+        logout,
+        register,
+        unlockAdmin,
+        lockAdmin,
+        updateProfile,
+        isProfileDrawerOpen,
+        setIsProfileDrawerOpen,
+        isAuthModalOpen,
+        setIsAuthModalOpen,
+        isAdminUnlockModalOpen,
+        setIsAdminUnlockModalOpen,
         role,
         setRole,
         username,

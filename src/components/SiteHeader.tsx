@@ -20,6 +20,9 @@ import {
   HelpCircle,
   Settings,
   Crown,
+  LogIn,
+  LogOut,
+  User,
 } from 'lucide-react';
 import { useApp, CURRENCIES } from '../context/AppContext';
 import { CurrencyCode } from '../types';
@@ -31,6 +34,12 @@ export const SiteHeader: React.FC = () => {
     setCurrentView,
     role,
     setRole,
+    currentUser,
+    isLoggedIn,
+    isAdminAuthenticated,
+    setIsProfileDrawerOpen,
+    setIsAuthModalOpen,
+    logout,
     displayName,
     selectedCurrency,
     setSelectedCurrency,
@@ -200,15 +209,43 @@ export const SiteHeader: React.FC = () => {
               </span>
             </button>
 
-            {/* User Profile Avatar (Solid Red Circle with "AP" as in reference image) */}
-            <button
-              type="button"
-              onClick={() => setCurrentView(role === 'seller' ? 'seller' : role === 'admin' ? 'admin' : 'buyer')}
-              className="size-9 rounded-full bg-[#C62828] hover:bg-[#B71C1C] text-white font-bold text-xs grid place-items-center shadow-xs transition-transform active:scale-95 cursor-pointer ml-0.5"
-              title={`Active Profile: ${displayName} (${role}) - Click to open console`}
-            >
-              AP
-            </button>
+            {/* User Profile Avatar or Sign In button */}
+            {isLoggedIn && currentUser ? (
+              <button
+                type="button"
+                onClick={() => setIsProfileDrawerOpen(true)}
+                className="size-9 rounded-full bg-[#C62828] hover:bg-[#B71C1C] text-white font-bold text-xs grid place-items-center shadow-xs transition-transform active:scale-95 cursor-pointer ml-0.5 relative"
+                title={`Active Profile: ${currentUser.name} (${currentUser.role}) - Click for individual profile`}
+              >
+                <span>
+                  {currentUser.name
+                    ? currentUser.name
+                        .split(' ')
+                        .map((p) => p[0])
+                        .slice(0, 2)
+                        .join('')
+                        .toUpperCase()
+                    : 'AP'}
+                </span>
+                {isAdminAuthenticated && (
+                  <span
+                    className="absolute -top-1 -right-1 size-3.5 rounded-full bg-amber-400 text-neutral-900 grid place-items-center text-[8px] font-black ring-1 ring-white"
+                    title="Master Admin Active"
+                  >
+                    👑
+                  </span>
+                )}
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setIsAuthModalOpen(true)}
+                className="h-9 px-3.5 rounded-full bg-[#C62828] hover:bg-[#B71C1C] text-white font-bold text-xs flex items-center gap-1.5 shadow-xs transition-transform active:scale-95 cursor-pointer ml-0.5"
+              >
+                <LogIn className="size-3.5" />
+                <span>Sign In</span>
+              </button>
+            )}
           </div>
         </div>
 
@@ -345,18 +382,75 @@ export const SiteHeader: React.FC = () => {
                   <Building2 className="size-4 text-amber-500" />
                   <span>Media Owner & Seller Console</span>
                 </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setRole('admin');
-                    setCurrentView('admin');
-                    setIsSidebarOpen(false);
-                  }}
-                  className="w-full flex items-center gap-3 px-3.5 py-2 rounded-xl text-neutral-700 hover:bg-neutral-50 font-semibold"
-                >
-                  <ShieldCheck className="size-4 text-[#C62828]" />
-                  <span>Master Operations Admin</span>
-                </button>
+                {isAdminAuthenticated && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setRole('admin');
+                      setCurrentView('admin');
+                      setIsSidebarOpen(false);
+                    }}
+                    className="w-full flex items-center gap-3 px-3.5 py-2 rounded-xl text-neutral-700 hover:bg-neutral-50 font-semibold"
+                  >
+                    <ShieldCheck className="size-4 text-[#C62828]" />
+                    <span>Master Operations Admin</span>
+                  </button>
+                )}
+              </div>
+
+              {/* User Account Section in Sidebar */}
+              <div className="pt-3 mt-3 border-t border-neutral-100 space-y-1">
+                <span className="px-3.5 text-[10px] font-bold text-neutral-400 uppercase tracking-wider block mb-1">
+                  Individual Profile
+                </span>
+                {isLoggedIn && currentUser ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsSidebarOpen(false);
+                        setIsProfileDrawerOpen(true);
+                      }}
+                      className="w-full flex items-center justify-between px-3.5 py-2 rounded-xl text-neutral-800 hover:bg-neutral-50 font-semibold"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <div className="size-6 rounded-full bg-[#C62828] text-white text-[10px] font-bold grid place-items-center">
+                          {currentUser.name
+                            ? currentUser.name.split(' ').map((p) => p[0]).slice(0, 2).join('').toUpperCase()
+                            : 'AP'}
+                        </div>
+                        <div className="text-left">
+                          <div className="text-xs font-bold text-neutral-900 leading-tight">{currentUser.name}</div>
+                          <div className="text-[10px] text-neutral-400 leading-tight">{currentUser.role}</div>
+                        </div>
+                      </div>
+                      <span className="text-[10px] text-[#C62828] font-bold">View Profile</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsSidebarOpen(false);
+                        logout();
+                      }}
+                      className="w-full flex items-center gap-3 px-3.5 py-2 rounded-xl text-rose-600 hover:bg-rose-50 font-semibold"
+                    >
+                      <LogOut className="size-4 text-rose-600" />
+                      <span>Log Out</span>
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsSidebarOpen(false);
+                      setIsAuthModalOpen(true);
+                    }}
+                    className="w-full flex items-center gap-3 px-3.5 py-2 rounded-xl text-[#C62828] bg-red-50 hover:bg-red-100 font-bold"
+                  >
+                    <LogIn className="size-4 text-[#C62828]" />
+                    <span>Sign In to Your Profile</span>
+                  </button>
+                )}
               </div>
 
               {/* Deployment Guide */}

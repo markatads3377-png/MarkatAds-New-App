@@ -8,9 +8,14 @@ interface ConsoleModeToggleProps {
 }
 
 export const ConsoleModeToggle: React.FC<ConsoleModeToggleProps> = ({ variant = 'compact' }) => {
-  const { role, setRole, setCurrentView, currentView } = useApp();
+  const { role, setRole, setCurrentView, currentView, isAdminAuthenticated, setIsAdminUnlockModalOpen } = useApp();
 
   const handleSelectRole = (newRole: Role) => {
+    if (newRole === 'admin' && !isAdminAuthenticated) {
+      setIsAdminUnlockModalOpen(true);
+      return;
+    }
+
     setRole(newRole);
     if (newRole === 'buyer') {
       setCurrentView('buyer');
@@ -52,19 +57,21 @@ export const ConsoleModeToggle: React.FC<ConsoleModeToggleProps> = ({ variant = 
           <span>Seller</span>
           {role === 'seller' && <span className="size-1.5 rounded-full bg-amber-500 animate-pulse ml-0.5" />}
         </button>
-        <button
-          type="button"
-          onClick={() => handleSelectRole('admin')}
-          className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-all cursor-pointer ${
-            role === 'admin' || currentView === 'admin'
-              ? 'bg-[#C62828] text-white shadow-xs font-bold'
-              : 'text-neutral-600 hover:text-neutral-900'
-          }`}
-          title="Switch to Master Operations Admin Console"
-        >
-          <ShieldCheck className="w-3.5 h-3.5" />
-          <span>Admin</span>
-        </button>
+        {isAdminAuthenticated && (
+          <button
+            type="button"
+            onClick={() => handleSelectRole('admin')}
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-all cursor-pointer ${
+              role === 'admin' || currentView === 'admin'
+                ? 'bg-[#C62828] text-white shadow-xs font-bold'
+                : 'text-neutral-600 hover:text-neutral-900'
+            }`}
+            title="Switch to Master Operations Admin Console"
+          >
+            <ShieldCheck className="w-3.5 h-3.5" />
+            <span>Admin</span>
+          </button>
+        )}
       </div>
     );
   }
@@ -118,18 +125,20 @@ export const ConsoleModeToggle: React.FC<ConsoleModeToggleProps> = ({ variant = 
         </div>
       </button>
 
-      <button
-        type="button"
-        onClick={() => handleSelectRole('admin')}
-        className={`w-full sm:w-auto flex items-center justify-center gap-2 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
-          role === 'admin'
-            ? 'bg-[#C62828] text-white shadow-md font-bold'
-            : 'text-neutral-400 hover:text-white hover:bg-neutral-800/60'
-        }`}
-      >
-        <ShieldCheck className="w-4 h-4 text-amber-400" />
-        <span className="font-bold text-xs">Master Admin</span>
-      </button>
+      {isAdminAuthenticated && (
+        <button
+          type="button"
+          onClick={() => handleSelectRole('admin')}
+          className={`w-full sm:w-auto flex items-center justify-center gap-2 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
+            role === 'admin'
+              ? 'bg-[#C62828] text-white shadow-md font-bold'
+              : 'text-neutral-400 hover:text-white hover:bg-neutral-800/60'
+          }`}
+        >
+          <ShieldCheck className="w-4 h-4 text-amber-400" />
+          <span className="font-bold text-xs">Master Admin</span>
+        </button>
+      )}
     </div>
   );
 };

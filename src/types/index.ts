@@ -1,5 +1,19 @@
 export type Role = 'buyer' | 'seller' | 'admin';
 
+export interface UserProfile {
+  id: string;
+  name: string;
+  email: string;
+  role: Role;
+  isAdmin: boolean;
+  company?: string;
+  phone?: string;
+  avatarUrl?: string;
+  bio?: string;
+  walletBalance?: number;
+  joinedDate?: string;
+}
+
 export type MediumType =
   | 'billboard'
   | 'digital_screen'

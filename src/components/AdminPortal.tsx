@@ -18,6 +18,8 @@ import {
   Sparkles,
   MapPin,
   AlertTriangle,
+  Lock,
+  KeyRound,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { ConsoleModeToggle } from './ConsoleModeToggle';
@@ -38,6 +40,10 @@ export const AdminPortal: React.FC = () => {
     announcementText,
     setAnnouncementText,
     username,
+    isAdminAuthenticated,
+    setIsAdminUnlockModalOpen,
+    lockAdmin,
+    setCurrentView,
   } = useApp();
 
   const [activeTab, setActiveTab] = useState<'kpi' | 'listings' | 'users' | 'settings'>('kpi');
@@ -45,7 +51,7 @@ export const AdminPortal: React.FC = () => {
 
   // Sample users
   const [users, setUsers] = useState([
-    { id: '1', name: 'Master Administrator', username: 'admin', email: 'admin@markatads.com', role: 'admin', status: 'active', company: 'Platform HQ' },
+    { id: '1', name: 'Master Administrator', username: 'admin', email: 'markatads3377@gmail.com', role: 'admin', status: 'active', company: 'Platform HQ' },
     { id: '2', name: 'Al-Khaleej Media Group', username: 'alkhaleej_owner', email: 'sales@alkhaleej.ae', role: 'seller', status: 'active', company: 'Al-Khaleej Outdoor' },
     { id: '3', name: 'PrimeMedia Manhattan', username: 'primemedia_ny', email: 'ny@primemedia.com', role: 'seller', status: 'active', company: 'PrimeMedia LLC' },
     { id: '4', name: 'Alex Morgan', username: 'alex_buyer', email: 'alex@brandglobal.com', role: 'buyer', status: 'active', company: 'Apex Global Retail' },
@@ -66,6 +72,45 @@ export const AdminPortal: React.FC = () => {
     toast.success('User access status updated.');
   };
 
+  // If user is not authenticated as Master Admin, show secure lock screen
+  if (!isAdminAuthenticated) {
+    return (
+      <div className="max-w-md mx-auto my-12 p-8 rounded-3xl bg-neutral-900 border border-neutral-800 text-white text-center space-y-5 shadow-2xl select-none animate-in fade-in duration-200">
+        <div className="size-16 rounded-2xl bg-red-950/80 border border-red-800/80 text-[#EF5350] grid place-items-center mx-auto">
+          <Lock className="size-8" />
+        </div>
+        <div className="space-y-1">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-red-950/60 border border-red-800/40 text-red-400 text-[10px] font-bold uppercase tracking-wider">
+            <ShieldAlert className="size-3" />
+            <span>Administrator Restricted Access</span>
+          </div>
+          <h2 className="text-xl font-black font-display text-white">Master Operations Admin</h2>
+          <p className="text-xs text-neutral-400 max-w-xs mx-auto leading-relaxed">
+            This administration control panel is strictly restricted to platform owners. Please verify your clearance to continue.
+          </p>
+        </div>
+
+        <div className="space-y-2 pt-2">
+          <button
+            type="button"
+            onClick={() => setIsAdminUnlockModalOpen(true)}
+            className="w-full py-2.5 px-4 rounded-xl bg-[#C62828] hover:bg-[#B71C1C] text-white font-bold text-xs uppercase tracking-wider shadow-lg shadow-red-900/40 transition-all flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <KeyRound className="size-4" />
+            <span>Authenticate as Admin</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setCurrentView('home')}
+            className="w-full py-2 px-4 rounded-xl border border-neutral-800 hover:bg-neutral-800 text-neutral-400 hover:text-white text-xs font-semibold transition-colors cursor-pointer"
+          >
+            Return to Marketplace Home
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Persitent Top Console Toggle Bar */}
@@ -76,11 +121,23 @@ export const AdminPortal: React.FC = () => {
           </span>
           <ConsoleModeToggle variant="compact" />
         </div>
-        <div className="flex items-center gap-2 text-xs">
+        <div className="flex items-center gap-3 text-xs">
           <span className="flex items-center gap-1.5 text-emerald-600 font-bold">
             <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
             <span>Master Admin Level 4 Clearance</span>
           </span>
+          <button
+            type="button"
+            onClick={() => {
+              lockAdmin();
+              toast.info('Admin mode locked and hidden.');
+            }}
+            className="px-2.5 py-1 rounded-lg border border-neutral-200 hover:bg-neutral-100 text-neutral-600 font-semibold text-[11px] flex items-center gap-1 cursor-pointer transition-colors"
+            title="Lock admin session and hide admin console from public view"
+          >
+            <Lock className="size-3 text-neutral-400" />
+            <span>Lock Admin Mode</span>
+          </button>
         </div>
       </div>
 

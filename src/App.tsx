@@ -15,12 +15,15 @@ import { CompareDrawer } from './components/CompareDrawer';
 import { WishlistDrawer } from './components/WishlistDrawer';
 import { OrdersTrackerModal } from './components/OrdersTrackerModal';
 import { CloudflareDeploymentModal } from './components/CloudflareDeploymentModal';
+import { ProfileDrawer } from './components/ProfileDrawer';
+import { AuthModal } from './components/AuthModal';
+import { AdminUnlockModal } from './components/AdminUnlockModal';
 import { Toaster } from 'sonner';
 import { Cloud, GitBranch, ShieldCheck } from 'lucide-react';
 import { BrandLogo } from './components/BrandLogo';
 
 function AppContent() {
-  const { currentView, setCurrentView, setIsDeployModalOpen } = useApp();
+  const { currentView, setCurrentView, setIsDeployModalOpen, isAdminAuthenticated, setIsAdminUnlockModalOpen } = useApp();
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] text-neutral-900 flex flex-col font-sans selection:bg-red-100 selection:text-[#C62828]">
@@ -98,7 +101,17 @@ function AppContent() {
                 </button>
               </li>
               <li>
-                <button type="button" onClick={() => setCurrentView('admin')} className="hover:text-neutral-900">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (isAdminAuthenticated) {
+                      setCurrentView('admin');
+                    } else {
+                      setIsAdminUnlockModalOpen(true);
+                    }
+                  }}
+                  className="hover:text-neutral-900"
+                >
                   Master Operations Admin
                 </button>
               </li>
@@ -135,6 +148,9 @@ function AppContent() {
       <WishlistDrawer />
       <OrdersTrackerModal />
       <CloudflareDeploymentModal />
+      <ProfileDrawer />
+      <AuthModal />
+      <AdminUnlockModal />
       <Toaster position="top-center" richColors />
     </div>
   );
