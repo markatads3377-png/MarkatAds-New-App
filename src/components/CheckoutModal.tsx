@@ -20,6 +20,7 @@ import { toast } from 'sonner';
 
 export const CheckoutModal: React.FC = () => {
   const {
+    currentUser,
     isCheckoutOpen,
     setIsCheckoutOpen,
     instantCheckoutItem,
@@ -39,9 +40,17 @@ export const CheckoutModal: React.FC = () => {
   const [completedOrder, setCompletedOrder] = useState<PlacedOrder | null>(null);
 
   // Billing Fields
-  const [fullName, setFullName] = useState('Alex Morgan');
-  const [email, setEmail] = useState('alex.morgan@brandglobal.com');
-  const [company, setCompany] = useState('Apex Global Retail Inc');
+  const [fullName, setFullName] = useState(currentUser?.name || '');
+  const [email, setEmail] = useState(currentUser?.email || '');
+  const [company, setCompany] = useState(currentUser?.company || '');
+
+  React.useEffect(() => {
+    if (currentUser) {
+      if (!fullName) setFullName(currentUser.name);
+      if (!email) setEmail(currentUser.email);
+      if (!company && currentUser.company) setCompany(currentUser.company);
+    }
+  }, [currentUser]);
   const [cardNumber, setCardNumber] = useState('4242 •••• •••• 4242');
   const [expiry, setExpiry] = useState('08/29');
   const [cvc, setCvc] = useState('892');

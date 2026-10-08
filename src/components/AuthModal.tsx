@@ -73,10 +73,11 @@ export const AuthModal: React.FC = () => {
 
   // Google Account Picker Modal state
   const [isGooglePickerOpen, setIsGooglePickerOpen] = useState(false);
-  const [customGoogleEmail, setCustomGoogleEmail] = useState('markatads3377@gmail.com');
-  const [customGoogleName, setCustomGoogleName] = useState('Platform Owner');
+  const [customGoogleEmail, setCustomGoogleEmail] = useState('');
+  const [customGoogleName, setCustomGoogleName] = useState('');
   const [googleChosenRole, setGoogleChosenRole] = useState<Role>('buyer');
   const [googleChosenCompany, setGoogleChosenCompany] = useState('');
+  const [googleAuthError, setGoogleAuthError] = useState<string | null>(null);
 
   if (!isAuthModalOpen) return null;
 
@@ -765,119 +766,112 @@ export const AuthModal: React.FC = () => {
             </div>
 
             <p className="text-xs text-neutral-500">
-              Select or enter your Google Account to instantly authenticate and claim your 100 OOH Coins.
+              Sign in or create your account using your Google Account credentials.
             </p>
 
-            {/* Quick selector options */}
-            <div className="space-y-2">
-              <button
-                type="button"
-                onClick={() => handleConfirmGoogleAuth('markatads3377@gmail.com', 'Mark@Ads Administrator', 'admin', 'Mark@Ads Operations HQ')}
-                className="w-full p-3 rounded-2xl border border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50 text-left transition-colors flex items-center gap-3 cursor-pointer group"
-              >
-                <div className="size-9 rounded-full bg-[#C62828] text-white font-bold text-xs grid place-items-center shrink-0">
-                  MA
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="text-xs font-bold text-neutral-900 truncate flex items-center gap-1.5">
-                    <span>Mark@Ads Platform Owner</span>
-                    <span className="text-[9px] bg-red-100 text-red-700 px-1.5 py-0.5 rounded font-bold">HQ</span>
-                  </div>
-                  <div className="text-[11px] text-neutral-500 font-mono truncate">markatads3377@gmail.com</div>
-                </div>
-              </button>
+            {googleAuthError && (
+              <div className="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-800 flex items-start gap-1.5">
+                <AlertCircle className="size-4 text-rose-600 shrink-0 mt-0.5" />
+                <span>{googleAuthError}</span>
+              </div>
+            )}
 
-              <button
-                type="button"
-                onClick={() => handleConfirmGoogleAuth('alex.morgan@brandglobal.com', 'Alex Morgan', 'buyer', 'Nike Global Campaigns')}
-                className="w-full p-3 rounded-2xl border border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50 text-left transition-colors flex items-center gap-3 cursor-pointer group"
-              >
-                <div className="size-9 rounded-full bg-blue-600 text-white font-bold text-xs grid place-items-center shrink-0">
-                  AM
+            {/* Account Role Selector if signing up */}
+            {activeTab === 'register' && (
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-neutral-500 uppercase tracking-wider block">
+                  Account Type
+                </label>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setGoogleChosenRole('buyer')}
+                    className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold border transition-colors cursor-pointer text-center ${
+                      googleChosenRole === 'buyer'
+                        ? 'bg-neutral-900 text-white border-neutral-900 shadow-2xs'
+                        : 'bg-neutral-50 text-neutral-700 border-neutral-200 hover:bg-neutral-100'
+                    }`}
+                  >
+                    Brand Advertiser
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setGoogleChosenRole('seller')}
+                    className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold border transition-colors cursor-pointer text-center ${
+                      googleChosenRole === 'seller'
+                        ? 'bg-neutral-900 text-white border-neutral-900 shadow-2xs'
+                        : 'bg-neutral-50 text-neutral-700 border-neutral-200 hover:bg-neutral-100'
+                    }`}
+                  >
+                    Media Owner
+                  </button>
                 </div>
-                <div className="min-w-0 flex-1">
-                  <div className="text-xs font-bold text-neutral-900 truncate flex items-center gap-1.5">
-                    <span>Alex Morgan</span>
-                    <span className="text-[9px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded font-bold">Advertiser</span>
-                  </div>
-                  <div className="text-[11px] text-neutral-500 font-mono truncate">alex.morgan@brandglobal.com</div>
-                </div>
-              </button>
+              </div>
+            )}
 
-              <button
-                type="button"
-                onClick={() => handleConfirmGoogleAuth('sarah.apex@mediaholding.com', 'Sarah Jenkins', 'seller', 'Apex Media Group')}
-                className="w-full p-3 rounded-2xl border border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50 text-left transition-colors flex items-center gap-3 cursor-pointer group"
-              >
-                <div className="size-9 rounded-full bg-emerald-600 text-white font-bold text-xs grid place-items-center shrink-0">
-                  SJ
+            {/* Google Email Input */}
+            <div className="space-y-3">
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-neutral-500 uppercase tracking-wider block">
+                  Google Email Address
+                </label>
+                <div className="relative">
+                  <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-neutral-400" />
+                  <input
+                    type="email"
+                    value={customGoogleEmail}
+                    onChange={(e) => {
+                      setCustomGoogleEmail(e.target.value);
+                      if (googleAuthError) setGoogleAuthError(null);
+                    }}
+                    placeholder="your.email@gmail.com"
+                    autoFocus
+                    className="w-full h-11 pl-10 pr-3 rounded-xl border border-neutral-200 bg-neutral-50/70 focus:bg-white text-xs font-medium text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[#C62828]/20 focus:border-[#C62828]"
+                  />
                 </div>
-                <div className="min-w-0 flex-1">
-                  <div className="text-xs font-bold text-neutral-900 truncate flex items-center gap-1.5">
-                    <span>Sarah Jenkins</span>
-                    <span className="text-[9px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded font-bold">Media Owner</span>
-                  </div>
-                  <div className="text-[11px] text-neutral-500 font-mono truncate">sarah.apex@mediaholding.com</div>
-                </div>
-              </button>
-            </div>
-
-            {/* Custom Google Account Input with Role Switcher */}
-            <div className="pt-3 border-t border-neutral-100 space-y-2.5">
-              <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-wider block">
-                Or sign up with any Google email:
-              </span>
-
-              {/* Role selection for new Google account */}
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => setGoogleChosenRole('buyer')}
-                  className={`flex-1 py-1.5 px-2 rounded-lg text-[11px] font-bold border transition-colors cursor-pointer text-center ${
-                    googleChosenRole === 'buyer'
-                      ? 'bg-neutral-900 text-white border-neutral-900'
-                      : 'bg-neutral-50 text-neutral-600 border-neutral-200 hover:bg-neutral-100'
-                  }`}
-                >
-                  Brand Advertiser
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setGoogleChosenRole('seller')}
-                  className={`flex-1 py-1.5 px-2 rounded-lg text-[11px] font-bold border transition-colors cursor-pointer text-center ${
-                    googleChosenRole === 'seller'
-                      ? 'bg-neutral-900 text-white border-neutral-900'
-                      : 'bg-neutral-50 text-neutral-600 border-neutral-200 hover:bg-neutral-100'
-                  }`}
-                >
-                  Media Owner
-                </button>
               </div>
 
-              <div className="flex gap-2">
-                <input
-                  type="email"
-                  value={customGoogleEmail}
-                  onChange={(e) => setCustomGoogleEmail(e.target.value)}
-                  placeholder="your.email@gmail.com"
-                  className="flex-1 h-9.5 px-3 rounded-xl border border-neutral-200 text-xs font-medium focus:outline-none focus:border-[#C62828]"
-                />
-                <button
-                  type="button"
-                  onClick={() => {
-                    const parsedName = customGoogleEmail.includes('@')
-                      ? customGoogleEmail.split('@')[0].replace(/[\._]/g, ' ')
-                      : 'Google User';
-                    handleConfirmGoogleAuth(
-                      customGoogleEmail,
-                      parsedName.charAt(0).toUpperCase() + parsedName.slice(1)
-                    );
-                  }}
-                  className="px-4 rounded-xl bg-[#C62828] hover:bg-[#B71C1C] text-white text-xs font-bold transition-colors cursor-pointer"
-                >
-                  Sign Up
-                </button>
-              </div>
+              {activeTab === 'register' && (
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-neutral-500 uppercase tracking-wider block">
+                    Full Name (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={customGoogleName}
+                    onChange={(e) => setCustomGoogleName(e.target.value)}
+                    placeholder="e.g. Jordan Smith"
+                    className="w-full h-10 px-3 rounded-xl border border-neutral-200 bg-neutral-50/70 focus:bg-white text-xs font-medium text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:border-[#C62828]"
+                  />
+                </div>
+              )}
+
+              <button
+                type="button"
+                onClick={() => {
+                  if (!customGoogleEmail.trim() || !customGoogleEmail.includes('@')) {
+                    setGoogleAuthError('Please enter a valid Google email address.');
+                    return;
+                  }
+                  const namePart = customGoogleName.trim() || customGoogleEmail.split('@')[0].replace(/[\._]/g, ' ');
+                  const formattedName = namePart.charAt(0).toUpperCase() + namePart.slice(1);
+                  handleConfirmGoogleAuth(
+                    customGoogleEmail.trim(),
+                    formattedName,
+                    activeTab === 'register' ? googleChosenRole : undefined,
+                    googleChosenCompany || undefined
+                  );
+                }}
+                className="w-full h-11 rounded-xl bg-neutral-900 hover:bg-black text-white font-bold text-xs flex items-center justify-center gap-2.5 transition-all shadow-xs cursor-pointer"
+              >
+                <svg className="size-4 shrink-0" viewBox="0 0 24 24">
+                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
+                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+                </svg>
+                <span>{activeTab === 'register' ? 'Create Account with Google' : 'Continue with Google'}</span>
+              </button>
             </div>
           </div>
         </div>

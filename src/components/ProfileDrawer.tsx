@@ -457,7 +457,7 @@ export const ProfileDrawer: React.FC = () => {
                       )}
                     </div>
 
-                    {/* Switch Demo Profile */}
+                    {/* Switch Account */}
                     <div className="pt-2 border-t border-neutral-200">
                       <button
                         type="button"
@@ -468,7 +468,7 @@ export const ProfileDrawer: React.FC = () => {
                         className="w-full py-2 px-3 rounded-xl border border-neutral-200 hover:bg-neutral-50 text-xs font-semibold text-neutral-700 flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                       >
                         <User className="size-3.5 text-neutral-500" />
-                        <span>Switch Account / Sign in as other role</span>
+                        <span>Sign In with Another Account</span>
                       </button>
                     </div>
                   </>

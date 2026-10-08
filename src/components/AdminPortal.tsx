@@ -54,7 +54,7 @@ export const AdminPortal: React.FC = () => {
     { id: '1', name: 'Master Administrator', username: 'admin', email: 'markatads3377@gmail.com', role: 'admin', status: 'active', company: 'Platform HQ' },
     { id: '2', name: 'Al-Khaleej Media Group', username: 'alkhaleej_owner', email: 'sales@alkhaleej.ae', role: 'seller', status: 'active', company: 'Al-Khaleej Outdoor' },
     { id: '3', name: 'PrimeMedia Manhattan', username: 'primemedia_ny', email: 'ny@primemedia.com', role: 'seller', status: 'active', company: 'PrimeMedia LLC' },
-    { id: '4', name: 'Alex Morgan', username: 'alex_buyer', email: 'alex@brandglobal.com', role: 'buyer', status: 'active', company: 'Apex Global Retail' },
+    { id: '4', name: 'Omnicom Media Buying', username: 'omnicom_buyer', email: 'campaigns@omnicom.com', role: 'buyer', status: 'active', company: 'Omnicom Media Group' },
     { id: '5', name: 'Elena Rostova', username: 'elena_bmw', email: 'elena.rostova@bmwgroup.com', role: 'buyer', status: 'active', company: 'BMW Group' },
   ]);
 

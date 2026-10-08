@@ -58,16 +58,23 @@ If you prefer using the GitHub Actions workflow in `.github/workflows/deploy.yml
 
 ---
 
-## 🌐 Custom Domain Setup (`www.markatads.com` or your own domain)
+## 🌐 Custom Domain Setup & White Screen Fix (`markatads.com`)
 
-Once Cloudflare Pages has finished deploying your site:
+### ⚠️ Why Did `markatads.com` Show a Blank White Screen?
+`markatads.com` in Cloudflare was previously serving from an older project deployment with outdated script chunks (`index-DmE0GZtq.js`), while your active GitHub repository is building under the Cloudflare service named **`mark-ads-webapp-1-10`**.
 
-1. Go to your Cloudflare project (`markatads`).
-2. Click **Custom domains** tab > **Set up a custom domain**.
-3. Enter your domain (e.g. `www.markatads.com`).
-4. If your domain's DNS is managed on Cloudflare, it will automatically route the CNAME for you with 1-click.
-5. If managed on GoDaddy, Namecheap, etc., add:
-   - **Type:** `CNAME`
-   - **Name:** `www` (or `@`)
-   - **Value:** `markatads.pages.dev`
-   - **Proxy:** Proxied (Orange cloud on Cloudflare)
+### 🚀 2-Step Fix to Point `markatads.com` to Your Latest Live App:
+1. **Link Custom Domain in Cloudflare Dashboard:**
+   - Log in to [dash.cloudflare.com](https://dash.cloudflare.com/).
+   - Click **Workers & Pages** on the left navigation.
+   - Select your active service: **`mark-ads-webapp-1-10`**.
+   - Go to **Settings** > **Domains & Routes** (or **Triggers** tab).
+   - Under **Custom Domains**, click **Add Custom Domain**.
+   - Enter `markatads.com` and click **Add Custom Domain** (and repeat for `www.markatads.com`).
+   - Cloudflare will instantly route all traffic for `markatads.com` to your latest build!
+
+2. **Purge Cloudflare Cache:**
+   - In Cloudflare Dashboard, select your zone **`markatads.com`**.
+   - Go to **Caching** > **Configuration** (or **Quick Actions** on the right).
+   - Click **Purge Cache** > **Purge Everything**.
+   - Open `https://markatads.com/` in an incognito window — the marketplace will load instantly with all fresh updates!
