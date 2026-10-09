@@ -1,11 +1,13 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "mark-ads-new-web-app",
+  "main": "worker.js",
   "compatibility_date": "2026-09-30",
   "compatibility_flags": [
     "nodejs_compat"
   ],
   "assets": {
+    "binding": "ASSETS",
     "directory": "./dist",
     "not_found_handling": "single-page-application"
   }
