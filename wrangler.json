@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "mark-ads-webapp-1-10",
+  "name": "mark-ads-new-web-app",
   "compatibility_date": "2026-09-30",
   "compatibility_flags": [
     "nodejs_compat"
